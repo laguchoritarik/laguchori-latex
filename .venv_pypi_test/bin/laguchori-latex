@@ -1,0 +1,6 @@
+#!/home/laguchori/Desktop/Projects/laguchori-latex/.venv_pypi_test/bin/python3
+import sys
+from laguchori_latex.cli import app
+if __name__ == '__main__':
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
+    sys.exit(app())
