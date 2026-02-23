@@ -22,7 +22,7 @@ class LatexParser:
 
     @staticmethod
     def extract_document(text):
-        """Extract content between \begin{document} and \end{document}."""
+        r"""Extract content between \begin{document} and \end{document}."""
         match = re.search(r'\\begin\{document\}(.*?)\\end\{document\}', text, re.DOTALL)
         return match.group(1).strip() if match else ''
 
