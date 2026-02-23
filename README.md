@@ -1,147 +1,48 @@
-# laguchori-latex
+The library transforms raw LaTeX files into a structured JSON format based on logical blocks. This allows LLMs to process mathematical content without being overwhelmed by LaTeX formatting commands.
+JSON Structure Produced
 
-`laguchori-latex` is a Python library that converts:
+The parser outputs a consistent hierarchical structure:
 
-- **LaTeX → JSON** (parsing)
-- **JSON → LaTeX** (generation)
+    env = "other": Capture plain text or LaTeX commands located outside any \begin...\end environment.
 
-It is designed to structure a LaTeX document into **sections** and **blocks** (LaTeX environments or free “other” text), then rebuild a `.tex` file from the JSON.
+    env = "theorem", "definition", "equation", etc.: Capture structured content from specific LaTeX environments.
 
----
+Preamble Configuration 🛠️
 
-## Installation
-
-From PyPI:
-
-```bash
-pip install laguchori-latex
-
-From github
-pip install "git+https://github.com/laguchoritarik/laguchori-latex.git"
-
-Core idea
-JSON structure produced by the parser
-
-The parser outputs a simple structure:
-
-Blocks
-
-env = "other": LaTeX content outside any \begin...\end... environment.
-
-env = "theorem", definition, etc.: content captured from a LaTeX environment.
-
-LaTeX preamble (preambule.tex)
-
-The generator can prepend a preamble at the beginning of the generated .tex.
-By default it looks for preambule.tex, but you can change it via preamble_path.
-
+The generator can prepend a LaTeX preamble to ensure the output is a stand-alone, compilable document. By default, it looks for a file named preambule.tex.
 Example preambule.tex
 
-Create a preambule.tex next to your scripts:
+Create a preambule.tex in your working directory:
 
-\documentclass[11pt,a4paper]{article}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage{amsmath,amssymb,amsthm}
-\begin{document}
+    Note: Including \begin{document} in your preamble is required if you want the generated output to be directly compilable.
 
+Usage (Python API) 🐍
+1. Parse a LaTeX file to JSON
+2. Parse raw LaTeX text directly
+3. Generate LaTeX from a JSON file
+4. Generate LaTeX from an in-memory JSON dictionary
+Command Line Interface (CLI) 💻
 
-Important: include \begin{document} in your preamble if you want the output to be directly compilable.
+If enabled in your pyproject.toml, you can use the library directly from your terminal:
 
-Usage (Python)
-1) Parse a LaTeX file → JSON
+Convert LaTeX to JSON:
 
-from laguchori_latex import LatexParser
+Convert JSON to LaTeX:
+Notes & Current Limitations ⚠️
 
-parser = LatexParser()
-data = parser.parse_file("course.tex")
+    Scope: The parser currently targets standard environments of the form \begin{ENV} ... \end{ENV}.
 
-LatexParser.save_json(data, "extracted_elements.json")
-2) Parse LaTeX text → JSON
-from laguchori_latex import LatexParser
+    Metadata: Environment options (e.g., \begin{theorem}[Optional title]) are currently kept within the content block and not yet extracted as separate metadata.
 
-latex_text = r"""
-\begin{document}
-\section{Intro}
-Hello
-\begin{theorem}
-A theorem text.
-\end{theorem}
-\end{document}
-"""
+    Applications: This library is ideal for:
 
-parser = LatexParser()
-data = parser.parse_text(latex_text)
-print(data)
+        RAG / AI Search: Indexing mathematical proofs by semantic chunks.
 
-3) Generate LaTeX from a JSON file
+        Educational Platforms: Segmenting long courses into manageable units.
 
-from laguchori_latex import LatexGenerator
+        Automated Publishing: Programmatically generating LaTeX documents from structured data.
 
-gen = LatexGenerator(preamble_path="preambule.tex")
-
-latex_code = gen.json_file_to_latex("extracted_elements.json")
-LatexGenerator.save_latex(latex_code, "output.tex")
-
-
-4) Generate LaTeX from an in-memory JSON dict
-from laguchori_latex import LatexGenerator
-
-data = {
-  "document": {
-    "sections": [
-      {
-        "title": "Section 1",
-        "blocks": [
-          {"env": "other", "content": "Free text.", "order": 0},
-          {"env": "theorem", "content": "Theorem content.", "order": 1}
-        ]
-      }
-    ]
-  }
-}
-
-gen = LatexGenerator(preamble_path="preambule.tex")
-latex_code = gen.json_data_to_latex(data)
-print(latex_code)
-Usage (CLI)
-
-If the CLI entrypoint is enabled in pyproject.toml, you can use:
-
-1) LaTeX → JSON
-laguchori-latex parse course.tex -o extracted_elements.json
-2) JSON → LaTeX (with preamble)
-laguchori-latex generate extracted_elements.json -o output.tex --preamble preambule.tex
-End-to-end example (workflow)
-
-You have course.tex
-
-Extract to JSON:
-laguchori-latex parse course.tex -o extracted_elements.json
-Generate a compilable .tex with a preamble:
-laguchori-latex generate extracted_elements.json -o output.tex --preamble preambule.tex
-Notes & current limitations
-
-The parser extracts environments of the form: \begin{ENV} ... \end{ENV}
-
-Environment options like \begin{theorem}[Optional title] are not extracted yet.
-
-This structure is useful for:
-
-indexing / RAG
-
-course segmentation
-
-clean document reconstruction
-
-Development
-
-Install dev dependencies:
-pip install -e .[dev]
-pytest -q
-License
+Development 🛠️
+License 📄
 
 MIT
-
-::contentReference[oaicite:0]{index=0}
