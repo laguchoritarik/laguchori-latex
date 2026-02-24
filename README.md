@@ -209,7 +209,7 @@ LatexGenerator.save_latex(latex_code, "output.tex")
 Example: generate .tex from Python dict
 
 from laguchori_latex import LatexGenerator
-```latex
+```json
 data = {
   "document": {
     "sections": [
@@ -223,7 +223,7 @@ data = {
     ]
   }
 }
-
+```
 gen = LatexGenerator(preamble_path="preambule.tex")
 latex_code = gen.json_data_to_latex(data)
 print(latex_code)
