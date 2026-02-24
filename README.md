@@ -77,7 +77,7 @@ Appends \end{document} at the end
 JSON format
 
 The parser returns a structure like:
-
+```json
 {
   "document": {
     "sections": [
@@ -92,10 +92,10 @@ The parser returns a structure like:
     ]
   }
 }
+```
 
 
-
-Blocks
+## Blocks
 
 env = "other": LaTeX text outside any \begin...\end... environment.
 
@@ -114,14 +114,14 @@ You can change it via LatexGenerator(preamble_path="...")
 Example preambule.tex
 
 Create a file called preambule.tex next to your scripts:
-
+```latex
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{amsmath,amssymb,amsthm}
 \begin{document}
-
+```
 
 ### Important: include \begin{document} in your preamble if you want the output .tex to be directly compilable.
 
@@ -132,7 +132,7 @@ LatexParser
 
 from laguchori_latex import LatexParser
 
-Methods
+### Methods
 
 parse_file(path: str) -> dict
 Parse a .tex file and return structured JSON (dict).
@@ -143,20 +143,18 @@ Parse LaTeX content provided as a string.
 save_json(data: dict, path: str) -> None (static)
 Save JSON dict into a file.
 
-Example: parse a file
-
-Example: parse a file
-
+### Example: parse a file
+```python
 from laguchori_latex import LatexParser
 
 parser = LatexParser()
 data = parser.parse_file("course.tex")
 
 LatexParser.save_json(data, "extracted_elements.json")
+```
 
-
-Example: parse LaTeX text
-
+### Example: parse LaTeX text
+```python
 from laguchori_latex import LatexParser
 
 latex_text = r"""
@@ -168,16 +166,16 @@ A theorem text.
 \end{theorem}
 \end{document}
 """
-
 parser = LatexParser()
 data = parser.parse_text(latex_text)
 print(data)
-
+```
 ## LatexGenerator
 
 ### Import:
+```python
 from laguchori_latex import LatexGenerator
-
+```
 Constructor
 
 LatexGenerator(preamble_path: str = "preambule.tex")
@@ -197,17 +195,17 @@ Generate LaTeX from an in-memory dict.
 save_latex(latex_code: str, path: str) -> None (static)
 Save LaTeX code into a .tex file.
 
-Example: generate .tex from JSON file
-
+## Example: generate .tex from JSON file
+```python
 from laguchori_latex import LatexGenerator
 
 gen = LatexGenerator(preamble_path="preambule.tex")
 latex_code = gen.json_file_to_latex("extracted_elements.json")
 
 LatexGenerator.save_latex(latex_code, "output.tex")
-
+```
 Example: generate .tex from Python dict
-
+```python
 from laguchori_latex import LatexGenerator
 ```json
 data = {
@@ -224,10 +222,11 @@ data = {
   }
 }
 ```
+```python
 gen = LatexGenerator(preamble_path="preambule.tex")
 latex_code = gen.json_data_to_latex(data)
 print(latex_code)
-
+```
 ## CLI
 
 If you enabled the CLI entrypoint in pyproject.toml, you can use:
@@ -263,10 +262,10 @@ Only \section{...} is handled (no \subsection yet).
 ## Development
 
 Install dev dependencies:
-
+```cli
 pip install -e .[dev]
 pytest -q
-
+```
 Development 🛠️
 License 📄
 
