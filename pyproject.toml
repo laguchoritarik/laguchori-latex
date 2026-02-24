@@ -9,7 +9,7 @@ description = "LaTeX <-> JSON parser/generator for structured math documents"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { file = "LICENSE" }
-authors = [{ name = "Ahmed Bj" }]
+authors = [{ name = "TARIK LAGUCHORI" }]
 keywords = ["latex", "parser", "json", "generator"]
 classifiers = [
   "License :: OSI Approved :: MIT License",
