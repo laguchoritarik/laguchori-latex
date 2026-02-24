@@ -50,16 +50,16 @@ Reads LaTeX content (from a file or a string)
 
 Removes some commands that are not needed for structure extraction (e.g., \label, \cite, \ref, \eqref)
 
-Extracts the content between \begin{document} and \end{document}
+Extracts the content between ```latex \begin{document} and \end{document} ```
 
 Splits the document into \section{...}
 
 Extracts LaTeX environments inside each section:
-
+```latex
 \begin{theorem}...\end{theorem}
 
 \begin{definition}...\end{definition}
-
+```
 etc.
 
 Anything that is not inside an environment is stored as a block with env="other".
@@ -251,10 +251,14 @@ laguchori-latex generate extracted_elements.json -o output.tex --preamble preamb
 Limitations
 
 The parser extracts environments of the form:
+```latex
 \begin{ENV} ... \end{ENV}
+```
 
 Environment options like:
+```latex
 \begin{theorem}[Optional title]
+```
 are not extracted yet.
 
 Only \section{...} is handled (no \subsection yet).
