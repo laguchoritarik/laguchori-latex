@@ -209,7 +209,7 @@ LatexGenerator.save_latex(latex_code, "output.tex")
 Example: generate .tex from Python dict
 
 from laguchori_latex import LatexGenerator
-
+```latex
 data = {
   "document": {
     "sections": [
