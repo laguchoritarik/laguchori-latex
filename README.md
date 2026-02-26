@@ -270,6 +270,94 @@ Install dev dependencies:
 pip install -e .[dev]
 pytest -q
 ```
+
+
+## OCR-to-Clean LaTeX Cleaner
+
+`laguchori-latex` includes an optional **OCR-to-clean LaTeX** cleaner designed for math lecture notes that come from OCR/PDF extraction.  
+It converts common “scanned course” patterns into structured LaTeX environments and headings, making downstream parsing and chunking much more reliable.
+
+### What it fixes / normalizes
+
+The cleaner targets patterns frequently produced by OCR:
+
+#### 1) Bold numbered titles → LaTeX headings (numbers removed)
+- `\textbf{2 Groupe orthogonal}` → `\section{Groupe orthogonal}`
+- `\textbf{2.1 Produit scalaire}` → `\subsection{Produit scalaire}`
+- `\textbf{2.1.3 Notation}` → `\subsubsection{Notation}`
+
+The numeric prefix is used only to infer the heading level and is **not** kept in the title.
+
+#### 2) Existing LaTeX headings → remove leading numbering (Arabic or Roman)
+- `\section{VI Positivité}` → `\section{Positivité}`
+- `\section{2 Le groupe $O_2(\mathbb{R})$}` → `\section{Le groupe $O_2(\mathbb{R})$}`
+
+This is implemented with a brace-aware parser, so titles containing nested braces/macros (e.g., `\mathbb{R}`) are handled correctly.
+
+#### 3) Statement headers → structured theorem-like environments
+It recognizes statement headers such as:
+- `Théorème 8. ...`
+- `\textbf{Proposition 16.} ...`
+- `Lemme 1. ...`
+- `Corollaire 4. ...`
+- `\textbf{Définition 16.} ...`
+- `\textbf{Exemple 2.} ...`
+
+and converts them into environments:
+- `theorem`, `proposition`, `lemma`, `corollary`, `definition`, `example`
+
+The OCR number is **not** reused in the resulting LaTeX output.
+
+#### 4) Proofs / remarks / variants
+- `Démonstration. ...` / `\textit{Démonstration.} ...` / `Démonstration 15. ...`
+  → `\begin{proof}...\end{proof}`
+- `Remarque : ...` / `\textbf{Remarque :} ...` / `Variante. ...`
+  → `\begin{remark}...\end{remark}`
+
+#### 5) Pedagogical blocks
+- `\textbf{Notations :}` → `\begin{notation}...\end{notation}`
+- `\textbf{Exemples :}` → `\begin{examples}...\end{examples}`
+- `\textbf{Remarques :}` → `\begin{remark}...\end{remark}` (plural form supported)
+
+### API
+
+#### `clean_text(text: str, *, add_labels: bool = True, strip_numeric_prefix_in_sections: bool = True) -> str`
+
+Cleans OCR-like LaTeX text and returns a cleaned LaTeX string.
+
+- `add_labels` (default `True`): auto-generates `\label{...}` for theorem-like environments.
+  - If a statement has a title `( ... )`, the label is based on a slug of that title.
+  - Otherwise labels are sequential per environment type: `thm:1`, `thm:2`, `prop:1`, etc.
+- `strip_numeric_prefix_in_sections` (default `True`): removes leading Arabic/Roman numbering from `\section{...}`, `\subsection{...}`, etc.
+
+#### `clean_file(input_path: str, output_path: str, *, add_labels: bool = True, strip_numeric_prefix_in_sections: bool = True) -> None`
+
+Reads a `.tex` file, cleans it, and writes the cleaned output to a new file.
+
+### Quick start examples
+
+#### Example 1 — Clean a file before parsing
+```python
+from laguchori_latex import LatexParser, clean_file
+
+clean_file("input.tex", "output.tex", add_labels=True)
+
+parser = LatexParser()
+data = parser.parse_file("output.tex")
+
+
+### Example 2 — Clean text directly
+from laguchori_latex import clean_text
+
+raw = r"\section{2 Le groupe $O_2(\mathbb{R})$}"
+print(clean_text(raw))
+# -> \section{Le groupe $O_2(\mathbb{R})$}
+
+Example 3 — Use inside parsing (optional)
+
+If you added preclean=True support in LatexParser.parse_file:
+
+
 Development 🛠️
 License 📄
 
